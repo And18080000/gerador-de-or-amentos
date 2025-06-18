@@ -1,0 +1,251 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Orçamentos Profissional</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+        "imports": {
+            "jspdf": "https://esm.sh/jspdf@2.5.1",
+            "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+            "chart.js/auto": "https://esm.sh/chart.js@4.4.2/auto"
+        }
+    }
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1>Gerador de Orçamentos Profissional</h1>
+        <div class="theme-switcher-container">
+            <img src="sun.png" alt="Light Mode">
+            <label class="theme-switcher">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <img src="moon.png" alt="Dark Mode">
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="main-grid">
+            <div class="form-column">
+
+                <section class="card">
+                    <h2><img src="company.png" class="icon"> Sua Empresa</h2>
+                    <div class="details-grid">
+                        <div class="form-group">
+                            <label for="company-name">Nome da Empresa</label>
+                            <input type="text" id="company-name" placeholder="Sua Empresa LTDA">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-cnpj">CNPJ (opcional)</label>
+                            <input type="text" id="company-cnpj" placeholder="00.000.000/0001-00">
+                        </div>
+                        <div class="form-group">
+                            <label for="company-whatsapp">WhatsApp</label>
+                            <input type="text" id="company-whatsapp" placeholder="(99) 99999-9999">
+                        </div>
+                         <div class="form-group">
+                            <label for="company-instagram">Instagram</label>
+                            <input type="text" id="company-instagram" placeholder="@seu-usuario">
+                        </div>
+                         <div class="form-group full-width">
+                            <label for="company-website">Website/Outro</label>
+                            <input type="text" id="company-website" placeholder="https://seu-site.com">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2><img src="client.png" class="icon"> Cliente e Validade</h2>
+                    <div class="details-grid">
+                        <div class="form-group">
+                            <label for="client-name">Nome do Cliente</label>
+                            <input type="text" id="client-name" placeholder="Nome do cliente">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-doc">CPF/CNPJ (opcional)</label>
+                            <input type="text" id="client-doc" placeholder="CPF ou CNPJ do cliente">
+                        </div>
+                        <div class="form-group">
+                            <label for="quote-date">Data</label>
+                            <input type="date" id="quote-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="quote-validity">Validade (dias)</label>
+                            <input type="number" id="quote-validity" value="15" placeholder="Ex: 15">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2><img src="items.png" class="icon"> Itens do Orçamento</h2>
+                    <div id="items-container">
+                        <!-- Itens serão adicionados aqui via JS -->
+                    </div>
+                    <button id="add-item-btn" class="btn btn-secondary">+ Adicionar Item</button>
+                </section>
+            </div>
+
+            <div class="sidebar-column">
+                <section class="card">
+                    <h2><img src="discount.png" class="icon"> Desconto e Total</h2>
+                     <div class="discount-grid">
+                        <div class="form-group">
+                            <label for="discount-percent">Desconto (%)</label>
+                            <input type="number" id="discount-percent" placeholder="0" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="discount-fixed">Desconto (R$)</label>
+                            <input type="number" id="discount-fixed" placeholder="0.00" min="0">
+                        </div>
+                    </div>
+                    <div id="total-container">
+                        <p>Subtotal: R$ <span id="subtotal-value">0,00</span></p>
+                        <p>Desconto: - R$ <span id="discount-value">0,00</span></p>
+                        <p class="total-final">Total: R$ <span id="total-value">0,00</span></p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2><img src="data.png" class="icon"> Gerenciar Dados</h2>
+                    <div class="data-buttons">
+                        <button id="save-btn" class="btn btn-secondary">Salvar Localmente</button>
+                        <button id="export-btn" class="btn btn-secondary">Exportar</button>
+                        <label for="import-file" class="btn btn-secondary">Importar</label>
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2><img src="pdf.png" class="icon"> Gerar PDF</h2>
+                    <div class="pdf-options">
+                         <div class="form-group">
+                            <label for="logo-upload">Logo da Empresa (Ideal: 500x500px)</label>
+                            <input type="file" id="logo-upload" accept="image/png, image/jpeg">
+                        </div>
+                        <div class="form-group">
+                            <label for="pdf-bg-color">Cor de Fundo do PDF</label>
+                            <input type="color" id="pdf-bg-color" value="#FFFFFF">
+                        </div>
+                        <div class="form-group-checkbox">
+                            <input type="checkbox" id="use-watermark" checked>
+                            <label for="use-watermark">Usar logo como marca d'água</label>
+                        </div>
+                    </div>
+                     <div class="generate-buttons">
+                        <button id="preview-pdf-btn" class="btn btn-secondary">Visualizar Prévia</button>
+                        <button id="generate-pdf-btn" class="btn btn-primary">Gerar PDF e Salvar</button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2><img src="history.png" class="icon"> Histórico e Análise</h2>
+                    <div id="analytics-container">
+                        <canvas id="progress-chart"></canvas>
+                        <h3 id="history-title">Histórico de Orçamentos</h3>
+                        <div id="history-list">
+                            <!-- History items will be injected here by JS -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Desenvolvido por anderson henrique</p>
+    </footer>
+
+    <!-- PDF Preview Modal -->
+    <div id="pdf-preview-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2>Prévia do Orçamento</h2>
+            <div id="pdf-preview-container"></div>
+        </div>
+    </div>
+
+    <!-- Template para o PDF -->
+    <div id="pdf-template-wrapper" style="position: absolute; left: -9999px; background: white;">
+        <div id="pdf-template">
+            <div id="pdf-watermark"></div>
+            <div class="pdf-header">
+                <div class="pdf-header-left">
+                    <img id="pdf-logo-preview" src="logo_placeholder.png" alt="Logo">
+                    <h1 id="pdf-company-name"></h1>
+                    <p id="pdf-company-cnpj"></p>
+                </div>
+                <div class="pdf-header-right">
+                    <h2>ORÇAMENTO</h2>
+                    <p>Nº: <span id="pdf-quote-number"></span></p>
+                    <p>Data: <span id="pdf-date"></span></p>
+                    <p>Validade: <span id="pdf-validity"></span> dias</p>
+                </div>
+            </div>
+            <div class="pdf-client">
+                <h3>ORÇAMENTO PARA:</h3>
+                <p><strong>Cliente:</strong> <span id="pdf-client-name"></span></p>
+                <p id="pdf-client-doc-container" style="display: none;"><strong>CPF/CNPJ:</strong> <span id="pdf-client-doc"></span></p>
+            </div>
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th class="item-col">Item</th>
+                        <th class="desc-col">Descrição</th>
+                        <th class="qtty-col">Qtd.</th>
+                        <th class="unit-col">Unid.</th>
+                        <th class="price-col">Preço Unit.</th>
+                        <th class="total-col">Total (R$)</th>
+                    </tr>
+                </thead>
+                <tbody id="pdf-items-body">
+                </tbody>
+                 <tfoot id="pdf-totals-foot">
+                    <tr>
+                        <td colspan="5" class="totals-label">Subtotal</td>
+                        <td class="totals-value">R$ <span id="pdf-subtotal"></span></td>
+                    </tr>
+                    <tr id="pdf-discount-row" style="display: none;">
+                        <td colspan="5" class="totals-label">Desconto (<span id="pdf-discount-label"></span>)</td>
+                        <td class="totals-value">- R$ <span id="pdf-discount"></span></td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td colspan="5" class="totals-label">Total</td>
+                        <td class="totals-value">R$ <span id="pdf-total-value"></span></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="pdf-footer">
+                <div id="pdf-socials">
+                    <!-- Social icons here -->
+                </div>
+                <p>Agradecemos a sua preferência! Este orçamento é válido por <span id="pdf-validity-footer"></span> dias.</p>
+                <p><strong><span id="pdf-footer-company-name"></span></strong></p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="watermark-container" style="display: none; position: absolute; left: -9999px;">
+        <img id="watermark-img" src="" style="width: 500px; height: auto;">
+    </div>
+
+    <div id="toast-notification" class="toast"></div>
+
+    <script type="module" src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('Service Worker registrado com sucesso:', registration.scope))
+                    .catch(error => console.log('Falha ao registrar Service Worker:', error));
+            });
+        }
+    </script>
+</body>
+</html>
